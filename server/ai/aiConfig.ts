@@ -1,17 +1,20 @@
+import Groq from "groq-sdk";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-export const geminiConfig = {
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY as string,
-  model: "gemini-2.0-flash-exp",
+export const groqConfig = {
+  apiKey: process.env.LLAMA_API_KEY as string,
+  model: "llama-3.1-8b-instant",
   maxTokens: 2048,
   temperature: 0.7
 };
 
-export const initializeGemini = () => {
-  if (!geminiConfig.apiKey) {
-    throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not found in environment variables");
+export const initializeGroq = () => {
+  if (!groqConfig.apiKey) {
+    throw new Error("LLAMA_API_KEY not found in environment variables");
   }
-  return geminiConfig;
+  return new Groq({
+    apiKey: groqConfig.apiKey,
+  });
 };
