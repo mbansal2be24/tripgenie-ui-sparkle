@@ -11,8 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import Itinerary from "./pages/Itinerary";
 import PlanB from "./pages/PlanB";
 import Nearby from "./pages/Nearby";
-import Login from "./pages/Login";
-import Account from "./pages/Account";
+import Login from "./pages/loginpage";
+import Account from "./pages/account";
 import NotFound from "./pages/NotFound";
 
 function Router() {
