@@ -1,20 +1,18 @@
 import dotenv from "dotenv";
-import Groq from "groq-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
-const groq = new Groq({
-  apiKey: process.env.LLAMA_API_KEY as string,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
 
 export async function tripGenieChat(userMessage: any): Promise<string> {
   try {
-    if (!process.env.LLAMA_API_KEY) {
-      console.error("❌ LLAMA_API_KEY is not set in environment variables!");
+    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      console.error("❌ GOOGLE_GENERATIVE_AI_API_KEY is not set in environment variables!");
       throw new Error("API key not configured");
     }
 
-    console.log("🤖 Calling Groq API with model: llama-3.1-8b-instant");
+    console.log("🤖 Calling Google Gemini API with model: gemini-1.5-flash");
     console.log("📝 User message length:", typeof userMessage === 'string' ? userMessage.length : JSON.stringify(userMessage).length);
 
     const systemPrompt = "You are TripGenie PRO MAX, an advanced AI travel engine and trip planner.\n\n" +
@@ -87,25 +85,25 @@ export async function tripGenieChat(userMessage: any): Promise<string> {
       "6. Return the JSON object directly\n\n" +
       "When asked for JSON, return ONLY the JSON object, nothing else.";
 
-    const body: any = {
-      model: "llama-3.1-8b-instant",
-      temperature: 0.2,
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const chat = model.startChat({
+      history: [
         {
           role: "user",
-          content: userMessage
+          parts: [{ text: systemPrompt }],
+        },
+        {
+          role: "model",
+          parts: [{ text: "I understand. I am TripGenie PRO MAX, your advanced AI travel engine and trip planner. I will follow all the instructions you've provided for creating personalized trip plans, handling shuffle requests, and providing comprehensive travel advice. I will always return valid JSON in the exact format requested without any markdown or explanations." }],
         }
       ]
-    };
+    });
 
-    const response = await groq.chat.completions.create(body);
-    const content = response.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+    const result = await chat.sendMessage(userMessage);
+    const content = result.response.text();
     
-    console.log("✅ Groq API response received");
+    console.log("✅ Gemini API response received");
     console.log("📄 Response length:", content.length);
     console.log("📄 Full response:", content);
     
@@ -128,7 +126,7 @@ export async function tripGenieChat(userMessage: any): Promise<string> {
     });
     
     if (error.message?.includes("API key") || error.message?.includes("authentication")) {
-      return "Error: API key issue. Please check your Groq API key configuration.";
+      return "Error: API key issue. Please check your Google Generative AI API key configuration.";
     }
     
     return `Sorry, I couldn't process your request. Error: ${error.message || "Unknown error"}`;
