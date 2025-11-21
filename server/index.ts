@@ -1,8 +1,19 @@
 import express, { type Request, Response, NextFunction } from "express";
+import dotenv from "dotenv";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+dotenv.config();
+
 const app = express();
+
+// CORS middleware
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -37,26 +48,45 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = registerRoutes(app);
+  try {
+    const server = registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
-  });
+      res.status(status).json({ message });
+      throw err;
+    });
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    const PORT = process.env.PORT || 5000;
+    const NODE_ENV = process.env.NODE_ENV || "development";
+
+    if (NODE_ENV === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`🚀 Server running on http://localhost:${PORT}`);
+      log(`📡 Environment: ${NODE_ENV}`);
+      log(`🔗 API available at http://localhost:${PORT}/api`);
+    });
+
+    server.on("error", (err: any) => {
+      if (err.code === "EADDRINUSE") {
+        log(`❌ Port ${PORT} is already in use. Please use a different port.`);
+      } else {
+        log(`❌ Server error: ${err.message}`);
+      }
+      process.exit(1);
+    });
+  } catch (error: any) {
+    log(`❌ Failed to start server: ${error.message}`);
+    console.error(error);
+    process.exit(1);
   }
-
-  const PORT = 5000;
-  server.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`);
-  });
 })();
 
 
