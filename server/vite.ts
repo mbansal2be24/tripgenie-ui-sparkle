@@ -31,17 +31,17 @@ export async function setupVite(app: Express, server: Server) {
     await import("vite")
   ).createServer({
     ...getServerOptions(),
-    root: path.resolve(process.cwd(), "client"),
     server: {
       middlewareMode: true,
       ...getServerOptions(),
       hmr: { server },
     },
     appType: "custom",
+    configFile: path.resolve(process.cwd(), "vite.config.ts"),
   });
 
   app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  app.use(async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
@@ -71,7 +71,7 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  app.use("*", (_req, res) => {
+  app.use((_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

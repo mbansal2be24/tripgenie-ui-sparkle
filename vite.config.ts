@@ -10,14 +10,14 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./client/src"),
-      "@assets": path.resolve(__dirname, "./client/public"),
-      "@shared": path.resolve(__dirname, "./shared"),
+      "@": path.resolve(process.cwd(), "client", "src"),
+      "@assets": path.resolve(process.cwd(), "client", "public"),
+      "@shared": path.resolve(process.cwd(), "shared"),
     },
   },
-  root: path.resolve(__dirname, "client"),
+  root: path.resolve(process.cwd(), "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    outDir: path.resolve(process.cwd(), "dist/public"),
     emptyOutDir: true,
   },
 }));

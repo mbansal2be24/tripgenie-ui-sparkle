@@ -4,7 +4,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./client/src/*"],
+      "@assets/*": ["./client/public/*"],
+      "@shared/*": ["./shared/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
