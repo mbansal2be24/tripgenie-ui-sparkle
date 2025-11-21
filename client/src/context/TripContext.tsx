@@ -8,14 +8,21 @@ interface TripContextType {
   previouslyShown: string[];
   addPreviouslyShown: (place: string) => void;
   clearHistory: () => void;
+  currentTrip: any;
+  setCurrentTrip: (trip: any) => void;
 }
 
-const TripContext = createContext(undefined);
+const TripContext = createContext<TripContextType | undefined>(undefined);
 
-export const TripProvider: React.FC = ({ children }) => {
-  const [userPreferences, setUserPreferences] = useState(null);
-  const [visited, setVisited] = useState([]);
-  const [previouslyShown, setPreviouslyShown] = useState([]);
+interface TripProviderProps {
+  children: ReactNode;
+}
+
+export const TripProvider: React.FC<TripProviderProps> = ({ children }) => {
+  const [userPreferences, setUserPreferences] = useState<any>(null);
+  const [visited, setVisited] = useState<string[]>([]);
+  const [previouslyShown, setPreviouslyShown] = useState<string[]>([]);
+  const [currentTrip, setCurrentTrip] = useState<any>(null);
 
   const addVisited = (place: string) => {
     setVisited(prev => [...new Set([...prev, place])]);
@@ -30,11 +37,31 @@ export const TripProvider: React.FC = ({ children }) => {
     setPreviouslyShown([]);
   };
 
+  const value: TripContextType = {
+    userPreferences,
+    setUserPreferences,
+    visited,
+    addVisited,
+    previouslyShown,
+    addPreviouslyShown,
+    clearHistory,
+    currentTrip,
+    setCurrentTrip
+  };
+
   return (
-    
+    <TripContext.Provider value={value}>
       {children}
-    
+    </TripContext.Provider>
   );
+};
+
+export const useTrip = () => {
+  const context = useContext(TripContext);
+  if (!context) {
+    throw new Error("useTrip must be used within TripProvider");
+  }
+  return context;
 };
 
 export const useTripContext = () => {
