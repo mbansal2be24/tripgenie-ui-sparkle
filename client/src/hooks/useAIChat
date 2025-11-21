@@ -8,7 +8,7 @@ interface Message {
 }
 
 export const useAIChat = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
   const sendMessage = async (message: string, context?: any) => {
