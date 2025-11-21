@@ -9,25 +9,33 @@ import type {
   InsertNearbyPlace,
   IndoorPlace,
   InsertIndoorPlace,
+  User,
+  InsertUser,
+  PublicUser,
 } from "../shared/schema";
 
 export interface IStorage {
+  // User operations
+  createUser(user: InsertUser): Promise<PublicUser>;
+  authenticateUser(email: string, password: string): Promise<PublicUser | null>;
+  updateUser(id: number, updates: Partial<Omit<User, "id" | "password" | "createdAt">>): Promise<PublicUser>;
+  changePassword(id: number, currentPassword: string, newPassword: string): Promise<void>;
+
   // Trip operations
   getTrips(): Promise<Trip[]>;
   getTrip(id: number): Promise<Trip | null>;
   createTrip(trip: InsertTrip): Promise<Trip>;
   updateTrip(id: number, trip: Partial<Trip>): Promise<Trip>;
+  deleteTrip(id: number): Promise<void>;
 
   // Attraction operations
   getAttractions(tripId: number): Promise<Attraction[]>;
   createAttraction(attraction: InsertAttraction): Promise<Attraction>;
   upvoteAttraction(id: number): Promise<Attraction>;
-  shuffleAttraction(tripId: number, day: number): Promise<Attraction>;
 
   // Restaurant operations
   getRestaurants(tripId: number): Promise<Restaurant[]>;
   createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant>;
-  shuffleRestaurant(tripId: number, day: number): Promise<Restaurant>;
 
   // Nearby place operations
   getNearbyPlaces(tripId: number, category?: string): Promise<NearbyPlace[]>;
@@ -35,26 +43,85 @@ export interface IStorage {
 
   // Indoor alternative operations
   getIndoorAlternatives(tripId: number): Promise<IndoorPlace[]>;
-
-  // Bulk operations for storing generated data
-  storeGeneratedAttractions(tripId: number, attractions: InsertAttraction[]): Promise<void>;
-  storeGeneratedRestaurants(tripId: number, restaurants: InsertRestaurant[]): Promise<void>;
-  storeGeneratedNearbyPlaces(tripId: number, places: InsertNearbyPlace[]): Promise<void>;
-  storeGeneratedIndoorPlaces(tripId: number, places: InsertIndoorPlace[]): Promise<void>;
 }
 
 // In-memory storage implementation
 class MemStorage implements IStorage {
+  private users: Map<number, User> = new Map();
   private trips: Map<number, Trip> = new Map();
   private attractions: Map<number, Attraction> = new Map();
   private restaurants: Map<number, Restaurant> = new Map();
   private nearbyPlaces: Map<number, NearbyPlace> = new Map();
   private indoorPlaces: Map<number, IndoorPlace> = new Map();
+  
+  private userIdCounter = 1;
   private tripIdCounter = 1;
   private attractionIdCounter = 1;
   private restaurantIdCounter = 1;
   private nearbyPlaceIdCounter = 1;
   private indoorPlaceIdCounter = 1;
+
+  // User operations
+  async createUser(user: InsertUser): Promise<PublicUser> {
+    // Check if user already exists
+    const existingUser = Array.from(this.users.values()).find(
+      (u) => u.email === user.email
+    );
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+
+    const newUser: User = {
+      ...user,
+      id: this.userIdCounter++,
+      createdAt: new Date(),
+    };
+    this.users.set(newUser.id, newUser);
+
+    // Return user without password
+    const { password, ...publicUser } = newUser;
+    return publicUser;
+  }
+
+  async authenticateUser(email: string, password: string): Promise<PublicUser | null> {
+    const user = Array.from(this.users.values()).find(
+      (u) => u.email === email && u.password === password
+    );
+    
+    if (!user) return null;
+    
+    const { password: _, ...publicUser } = user;
+    return publicUser;
+  }
+
+  async updateUser(
+    id: number,
+    updates: Partial<Omit<User, "id" | "password" | "createdAt">>
+  ): Promise<PublicUser> {
+    const user = this.users.get(id);
+    if (!user) throw new Error("User not found");
+
+    const updatedUser = { ...user, ...updates };
+    this.users.set(id, updatedUser);
+
+    const { password, ...publicUser } = updatedUser;
+    return publicUser;
+  }
+
+  async changePassword(
+    id: number,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    const user = this.users.get(id);
+    if (!user) throw new Error("User not found");
+    if (user.password !== currentPassword) {
+      throw new Error("Current password is incorrect");
+    }
+
+    user.password = newPassword;
+    this.users.set(id, user);
+  }
 
   // Trip operations
   async getTrips(): Promise<Trip[]> {
@@ -83,6 +150,29 @@ class MemStorage implements IStorage {
     return updated;
   }
 
+  async deleteTrip(id: number): Promise<void> {
+    if (!this.trips.has(id)) throw new Error("Trip not found");
+    
+    // Delete associated data
+    Array.from(this.attractions.values())
+      .filter((a) => a.tripId === id)
+      .forEach((a) => this.attractions.delete(a.id!));
+    
+    Array.from(this.restaurants.values())
+      .filter((r) => r.tripId === id)
+      .forEach((r) => this.restaurants.delete(r.id!));
+    
+    Array.from(this.nearbyPlaces.values())
+      .filter((p) => p.tripId === id)
+      .forEach((p) => this.nearbyPlaces.delete(p.id!));
+    
+    Array.from(this.indoorPlaces.values())
+      .filter((p) => p.tripId === id)
+      .forEach((p) => this.indoorPlaces.delete(p.id!));
+
+    this.trips.delete(id);
+  }
+
   // Attraction operations
   async getAttractions(tripId: number): Promise<Attraction[]> {
     return Array.from(this.attractions.values()).filter(
@@ -107,14 +197,6 @@ class MemStorage implements IStorage {
     return attraction;
   }
 
-  async shuffleAttraction(tripId: number, day: number): Promise<Attraction> {
-    const attractions = Array.from(this.attractions.values()).filter(
-      (a) => a.tripId === tripId && a.timing === this.getTimingByDay(day)
-    );
-    if (attractions.length === 0) throw new Error("No attractions found");
-    return attractions[Math.floor(Math.random() * attractions.length)];
-  }
-
   // Restaurant operations
   async getRestaurants(tripId: number): Promise<Restaurant[]> {
     return Array.from(this.restaurants.values()).filter(
@@ -130,14 +212,6 @@ class MemStorage implements IStorage {
     };
     this.restaurants.set(newRestaurant.id, newRestaurant);
     return newRestaurant;
-  }
-
-  async shuffleRestaurant(tripId: number, day: number): Promise<Restaurant> {
-    const restaurants = Array.from(this.restaurants.values()).filter(
-      (r) => r.tripId === tripId && r.day === day
-    );
-    if (restaurants.length === 0) throw new Error("No restaurants found");
-    return restaurants[Math.floor(Math.random() * restaurants.length)];
   }
 
   // Nearby place operations
@@ -161,47 +235,6 @@ class MemStorage implements IStorage {
     return Array.from(this.indoorPlaces.values()).filter(
       (p) => p.tripId === tripId
     );
-  }
-
-  // Bulk operations
-  async storeGeneratedAttractions(tripId: number, attractions: InsertAttraction[]): Promise<void> {
-    for (const attraction of attractions) {
-      await this.createAttraction(attraction);
-    }
-  }
-
-  async storeGeneratedRestaurants(tripId: number, restaurants: InsertRestaurant[]): Promise<void> {
-    for (const restaurant of restaurants) {
-      await this.createRestaurant(restaurant);
-    }
-  }
-
-  async storeGeneratedNearbyPlaces(tripId: number, places: InsertNearbyPlace[]): Promise<void> {
-    for (const place of places) {
-      const newPlace: NearbyPlace = {
-        ...place,
-        id: this.nearbyPlaceIdCounter++,
-        upvotes: 0,
-      };
-      this.nearbyPlaces.set(newPlace.id, newPlace);
-    }
-  }
-
-  async storeGeneratedIndoorPlaces(tripId: number, places: InsertIndoorPlace[]): Promise<void> {
-    for (const place of places) {
-      const newPlace: IndoorPlace = {
-        ...place,
-        id: this.indoorPlaceIdCounter++,
-      };
-      this.indoorPlaces.set(newPlace.id, newPlace);
-    }
-  }
-
-  // Helper method
-  private getTimingByDay(day: number): string {
-    if (day % 3 === 1) return "Morning";
-    if (day % 3 === 2) return "Afternoon";
-    return "Evening";
   }
 }
 
