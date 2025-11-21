@@ -12,7 +12,7 @@ export async function tripGenieChat(userMessage: any): Promise<string> {
       throw new Error("API key not configured");
     }
 
-    console.log("🤖 Calling Google Gemini API with model: gemini-1.5-flash");
+    console.log("🤖 Calling Google Gemini API with model: gemini-2.0-flash-exp");
     console.log("📝 User message length:", typeof userMessage === 'string' ? userMessage.length : JSON.stringify(userMessage).length);
 
     const systemPrompt = "You are TripGenie PRO MAX, an advanced AI travel engine and trip planner.\n\n" +
@@ -85,7 +85,7 @@ export async function tripGenieChat(userMessage: any): Promise<string> {
       "6. Return the JSON object directly\n\n" +
       "When asked for JSON, return ONLY the JSON object, nothing else.";
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const chat = model.startChat({
       history: [

@@ -4,7 +4,7 @@ dotenv.config();
 
 export const geminiConfig = {
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY as string,
-  model: "gemini-1.5-flash",
+  model: "gemini-2.0-flash-exp",
   maxTokens: 2048,
   temperature: 0.7
 };
