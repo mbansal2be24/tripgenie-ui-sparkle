@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import Itinerary from "./pages/Itinerary";
 import PlanB from "./pages/PlanB";
 import Nearby from "./pages/Nearby";
+import Login from "./pages/Login";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 
 function Router() {
@@ -18,6 +20,8 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/login" component={Login} />
+        <Route path="/account" component={Account} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/itinerary" component={Itinerary} />
         <Route path="/plan-b" component={PlanB} />
