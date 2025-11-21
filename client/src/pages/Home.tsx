@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Mic, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 const interests = [
   "Adventure",
@@ -20,7 +21,12 @@ const interests = [
 
 const Home = () => {
   const [, setLocation] = useLocation();
+  const [destination, setDestination] = useState("");
+  const [days, setDays] = useState("");
+  const [budget, setBudget] = useState("");
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [travelStyle, setTravelStyle] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleInterest = (interest: string) => {
     setSelectedInterests((prev) =>
@@ -30,8 +36,55 @@ const Home = () => {
     );
   };
 
-  const handleGenerateTrip = () => {
-    setLocation("/dashboard");
+  const handleGenerateTrip = async () => {
+    if (!destination.trim()) {
+      toast.error("Please enter a destination");
+      return;
+    }
+    if (!days || parseInt(days) < 1) {
+      toast.error("Please enter valid number of days");
+      return;
+    }
+    if (!budget || parseInt(budget) < 0) {
+      toast.error("Please enter a valid budget");
+      return;
+    }
+    if (selectedInterests.length === 0) {
+      toast.error("Please select at least one interest");
+      return;
+    }
+    if (!travelStyle) {
+      toast.error("Please select a travel style");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          destination,
+          days: parseInt(days),
+          budget: parseInt(budget),
+          interests: selectedInterests,
+          travelStyle,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create trip");
+      }
+
+      const trip = await response.json();
+      toast.success("Trip created successfully!");
+      setLocation("/dashboard");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create trip. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,6 +110,8 @@ const Home = () => {
               id="destination"
               placeholder="e.g., Paris, France"
               className="h-12"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
             />
           </div>
 
@@ -68,6 +123,8 @@ const Home = () => {
                 type="number"
                 placeholder="7"
                 className="h-12"
+                value={days}
+                onChange={(e) => setDays(e.target.value)}
               />
             </div>
 
@@ -78,6 +135,8 @@ const Home = () => {
                 type="number"
                 placeholder="2000"
                 className="h-12"
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
               />
             </div>
           </div>
@@ -109,7 +168,7 @@ const Home = () => {
 
           <div className="space-y-2">
             <Label htmlFor="travelStyle">Travel Style</Label>
-            <Select>
+            <Select value={travelStyle} onValueChange={setTravelStyle}>
               <SelectTrigger id="travelStyle" className="h-12">
                 <SelectValue placeholder="Select your travel style" />
               </SelectTrigger>
@@ -125,10 +184,11 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button
               onClick={handleGenerateTrip}
+              disabled={isLoading}
               className="flex-1 h-12 text-base font-semibold"
               size="lg"
             >
-              Generate Trip
+              {isLoading ? "Creating Trip..." : "Generate Trip"}
             </Button>
             <Button
               variant="outline"
