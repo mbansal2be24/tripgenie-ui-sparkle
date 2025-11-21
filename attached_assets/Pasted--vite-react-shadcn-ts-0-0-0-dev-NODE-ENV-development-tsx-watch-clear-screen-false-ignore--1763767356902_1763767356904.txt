@@ -1,0 +1,242 @@
+> vite_react_shadcn_ts@0.0.0 dev
+> NODE_ENV=development tsx watch --clear-screen=false --ignore '**/*.timestamp-*11:20:49 PM 🚀 Server running on http://localhost:5000
+11:20:49 PM 📡 Environment: development
+11:20:49 PM 🔗 API available at http://localhost:5000/api
+🤖 Calling Groq API with model: llama-3.1-8b-instant
+📝 User message length: 1857
+✅ Groq API response received
+📄 Response length: 6160
+📄 Full response: {
+  "days": [
+    {
+      "day": 1,
+      "places": [
+        {
+          "name": "Eiffel Tower",
+          "type": "Landmark",
+          "description": "The iconic iron lattice tower",
+          "timing": "Early morning (6-10 AM) for optimal views",
+          "transport": "Metro Line 6 to Bir-Hakeim station (0.5 km)",
+          "distance": "0.5 km"
+        },
+        {
+          "name": "Musée d'Orsay",
+          "type": "Museum",
+          "description": "Impressionist and Post-Impressionist art",
+          "timing": "Late afternoon (4:30-7 PM) for fewer crowds",
+          "transport": "Metro Line 12 to Solférino station (0.2 km)",
+          "distance": "0.2 km"
+        },
+        {
+          "name": "Arc de Triomphe",
+          "type": "Monument",
+          "description": "Honoring Napoleon's military victories",
+          "timing": "Anytime, but avoid peak hours for crowds",
+          "transport": "Metro Line 1 to Charles de Gaulle-Etoile station (0.1 km)",
+          "distance": "0.1 km"
+        },
+        {
+          "name": "Palais-Royal",
+          "type": "Palace",
+          "description": "Former royal palace with beautiful gardens",
+          "timing": "Early morning or late afternoon for fewer crowds",
+          "transport": "Metro Line 1 to Palais-Royal-Musée du Louvre station (0.2 km)",
+          "distance": "0.2 km"
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "places": [
+        {
+          "name": "Louvre Museum",
+          "type": "Museum",
+          "description": "World's largest art museum",
+          "timing": "Late afternoon (4:30-7 PM) for fewer crowds",
+          "transport": "Metro Line 1 to Palais-Royal-Musée du Louvre station (0.2 km)",
+          "distance": "0.2 km"
+        },
+        {
+          "name": "Notre-Dame Cathedral",
+          "type": "Cathedral",
+          "description": "Gothic church with stunning architecture",
+          "timing": "Anytime, but avoid peak hours for crowds",
+          "transport": "Metro Line 4 to Cité station (0.2 km)",
+          "distance": "0.2 km"
+        },
+        {
+          "name": "Sainte-Chapelle",
+          "type": "Cathedral",
+          "description": "Beautiful stained glass windows",
+          "timing": "Early morning or late afternoon for fewer crowds",
+          "transport": "Metro Line 1 to Sainte-Chapelle station (0.1 km)",
+          "distance": "0.1 km"
+        },
+        {
+          "name": "Pont des Arts",
+          "type": "Bridge",
+          "description": "Pedestrian bridge with great views",
+          "timing": "Anytime, but avoid peak hours for crowds",
+          "transport": "Metro Line 7 to Pont des Arts station (0.1 km)",
+          "distance": "0.1 km"
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "places": [
+        {
+          "name": "Montmartre",
+          "type": "Neighborhood",
+          "description": "Charming artistic quarter",
+          "timing": "Early morning or late afternoon for fewer crowds",
+          "transport": "Metro Line 12 to Anvers station (0.5 km)",
+          "distance": "0.5 km"
+        },
+        {
+          "name": "Sacré-Cœur Basilica",
+          "type": "Basilica",
+          "description": "Beautiful white church with stunning views",
+          "timing": "Anytime, but avoid peak hours for crowds",
+          "transport": "Metro Line 12 to Anvers station (0.5 km)",
+          "distance": "0.5 km"
+        },
+        {
+          "name": "Place du Tertre",
+          "type": "Square",
+          "description": "Charming square with street performers",
+          "timing": "Anytime, but avoid peak hours for crowds",
+          "transport": "Metro Line 12 to Anvers station (0.5 km)",
+          "distance": "0.5 km"
+        },
+        {
+          "name": "Catacombes de Paris",
+          "type": "Museum",
+          "description": "Underground ossuary with historic significance",
+          "timing": "Late afternoon (4:30-7 PM) for fewer crowds",
+          "transport": "Metro Line 4 to Denfert-Rochereau station (0.5 km)",
+          "distance": "0.5 km"
+        }
+      ]
+    }
+  ],
+  "cafes": [
+    {
+      "name": "Café de Flore",
+      "vibe": "Classic Parisian",
+      "price": "Moderate",
+      "best dish": "Croque-monsieur",
+      "distance": "0.2 km"
+    },
+    {
+      "name": "Les Deux Magots",
+      "vibe": "Intellectual",
+      "price": "Moderate",
+      "best dish": "Salade niçoise",
+      "distance": "0.3 km"
+    },
+    {
+      "name": "Café Marly",
+      "vibe": "Modern",
+      "price": "Expensive",
+      "best dish": "Foie gras",
+      "distance": "0.4 km"
+    },
+    {
+      "name": "Angelina",
+      "vibe": "Luxurious",
+      "price": "Expensive",
+      "best dish": "Hot chocolate",
+      "distance": "0.5 km"
+    },
+    {
+      "name": "Le Comptoir du Relais",
+      "vibe": "Cozy",
+      "price": "Moderate",
+      "best dish": "Steak tartare",
+      "distance": "0.6 km"
+    },
+    {
+      "name": "Breizh Café",
+      "vibe": "Casual",
+      "price": "Affordable",
+      "best dish": "Crêpes",
+      "distance": "0.7 km"
+    },
+    {
+      "name": "Le Pain Quotidien",
+      "vibe": "Healthy",
+      "price": "Affordable",
+      "best dish": "Sandwiches",
+      "distance": "0.8 km"
+    }
+  ],
+  "medical": [
+    {
+      "name": "Pharmacie de la Concorde",
+      "address": "12 Rue de la Concorde, 75008 Paris",
+      "distance": "0.5 km"
+    },
+    {
+      "name": "Pharmacie des Champs-Élysées",
+      "address": "24 Rue des Champs-Élysées, 75008 Paris",
+      "distance": "0.6 km"
+    },
+    {
+      "name": "Pharmacie de l'Étoile",
+      "address": "10 Place Charles de Gaulle, 75008 Paris",
+      "distance": "0.7 km"
+    }
+  ],
+  "tips": [
+    {
+      "tip": "Carry a water bottle and stay hydrated",
+      "weather": "Hot"
+    },
+    {
+      "tip": "Wear comfortable shoes and dress for the weather",
+      "weather": "Rainy"
+    },
+    {
+      "tip": "Be mindful of pickpocketing in crowded areas",
+      "weather": "Any"
+    },
+    {
+      "tip": "Try to avoid eating at touristy restaurants",
+      "weather": "Any"
+    },
+    {
+      "tip": "Learn some basic French phrases to interact with locals",
+      "weather": "Any"
+    }
+  ]
+}
+📄 First 200 chars: {
+  "days": [
+    {
+      "day": 1,
+      "places": [
+        {
+          "name": "Eiffel Tower",
+          "type": "Landmark",
+          "description": "The iconic iron lattice tower",
+          "tim
+📄 Last 200 chars:     "tip": "Try to avoid eating at touristy restaurants",
+      "weather": "Any"
+    },
+    {
+      "tip": "Learn some basic French phrases to interact with locals",
+      "weather": "Any"
+    }
+  ]
+}
+✅ Successfully parsed AI response
+11:20:58 PM POST /api/ai/trip-plan 200 in 2170ms :: {"success":true,"data":{"days":[{"day":…
+11:21:25 PM POST /api/auth/signup 201 in 2ms :: {"user":{"name":"devarya","email":"devarya2…
+11:21:35 PM POST /api/trips 201 in 2ms :: {"destination":"patiala","days":4,"budget":12000,…
+11:21:37 PM POST /api/trips 201 in 1ms :: {"destination":"patiala","days":4,"budget":12000,…
+11:21:37 PM POST /api/trips 201 in 1ms :: {"destination":"patiala","days":4,"budget":12000,…
+11:21:38 PM POST /api/trips 201 in 1ms :: {"destination":"patiala","days":4,"budget":12000,…
+11:21:38 PM POST /api/trips 201 in 1ms :: {"destination":"patiala","days":4,"budget":12000,…
+11:21:39 PM POST /api/trips 201 in 1ms :: {"destination":"patiala","days":4,"budget":12000,…
+^C
