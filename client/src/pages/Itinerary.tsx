@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { MapPin, Clock, Shuffle, ArrowUp, Volume2, Download, Utensils, Star, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTrip } from "@/context/TripContext";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 const Itinerary = () => {
   const [, setLocation] = useLocation();
@@ -12,6 +13,7 @@ const Itinerary = () => {
   const [attractions, setAttractions] = useState<any[]>([]);
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { speak, stop, isSpeaking, isSupported } = useTextToSpeech();
 
   useEffect(() => {
     if (currentTrip) {
@@ -24,15 +26,28 @@ const Itinerary = () => {
     try {
       setLoading(true);
       const [attRes, restRes] = await Promise.all([
-        fetch(`/api/trips/${currentTrip.id}/attractions`),
-        fetch(`/api/trips/${currentTrip.id}/restaurants`),
+        fetch(`/api/trips/${currentTrip.id}/attractions`).catch(() => ({ json: async () => [] })),
+        fetch(`/api/trips/${currentTrip.id}/restaurants`).catch(() => ({ json: async () => [] })),
       ]);
+      
       const attractions = await attRes.json();
       const restaurants = await restRes.json();
-      setAttractions(attractions.length > 0 ? attractions : mockAttractions);
-      setRestaurants(restaurants.length > 0 ? restaurants : mockLunchSpots);
+      
+      // Only use mock data if we have no real data
+      if (Array.isArray(attractions) && attractions.length > 0) {
+        setAttractions(attractions);
+      } else {
+        setAttractions(mockAttractions);
+      }
+      
+      if (Array.isArray(restaurants) && restaurants.length > 0) {
+        setRestaurants(restaurants);
+      } else {
+        setRestaurants(mockLunchSpots);
+      }
     } catch (error) {
       console.error("Failed to load data:", error);
+      // Fallback to mock data on error
       setAttractions(mockAttractions);
       setRestaurants(mockLunchSpots);
     } finally {
@@ -40,10 +55,24 @@ const Itinerary = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Loading your itinerary...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
   if (!currentTrip) {
     return (
       <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
-        <p className="text-muted-foreground">No trip selected</p>
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">No trip selected</p>
+          <Button onClick={() => setLocation("/home")}>Create a Trip</Button>
+        </div>
       </div>
     );
   }
@@ -107,15 +136,21 @@ const Itinerary = () => {
         </Card>
 
         <div className="space-y-8">
-          {Array.from({ length: currentTrip.days }).map((_, day) => (
-            <Card key={day} className="overflow-hidden">
+          {Array.from({ length: currentTrip.days }).map((_, dayIndex) => {
+            // Get attractions for this specific day (if structured by day) or show all
+            const dayAttractions = attractions.filter((attr: any) => 
+              attr.day === dayIndex + 1 || !attr.day
+            ).slice(0, 5); // Limit to 5 per day
+            
+            return (
+            <Card key={dayIndex} className="overflow-hidden">
               <div className="bg-primary text-primary-foreground p-4">
-                <h2 className="text-2xl font-bold">Day {day + 1}</h2>
+                <h2 className="text-2xl font-bold">Day {dayIndex + 1}</h2>
               </div>
 
               <div className="p-6 space-y-6">
                 <div className="space-y-4">
-                  {attractions.map((attraction, idx) => (
+                  {(dayAttractions.length > 0 ? dayAttractions : attractions.slice(0, 4)).map((attraction, idx) => (
                     <Card key={idx} className="p-4 hover:shadow-medium transition-shadow">
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
@@ -153,7 +188,7 @@ const Itinerary = () => {
                     <h3 className="font-semibold text-foreground">Lunch Recommendations</h3>
                   </div>
                   <div className="space-y-3">
-                    {restaurants.map((spot, idx) => (
+                    {restaurants.slice(0, 3).map((spot, idx) => (
                       <div
                         key={idx}
                         className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-background rounded-lg"
@@ -179,13 +214,28 @@ const Itinerary = () => {
                 </Card>
               </div>
             </Card>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <Button size="lg" className="flex-1 gap-2">
+          <Button 
+            size="lg" 
+            className="flex-1 gap-2"
+            onClick={() => {
+              if (isSpeaking) {
+                stop();
+              } else {
+                const itineraryText = attractions.map((attr, idx) => 
+                  `Day ${idx + 1}: Visit ${attr.name} at ${attr.timing}. ${attr.description}`
+                ).join(". ");
+                speak(itineraryText);
+              }
+            }}
+            disabled={!isSupported}
+          >
             <Volume2 className="h-5 w-5" />
-            Speak Itinerary Aloud
+            {isSpeaking ? "Stop Speaking" : "Speak Itinerary Aloud"}
           </Button>
           <Button variant="outline" size="lg" className="flex-1 gap-2 border-2">
             <Download className="h-5 w-5" />
