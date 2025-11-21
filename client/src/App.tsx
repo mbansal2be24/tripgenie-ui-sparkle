@@ -13,6 +13,7 @@ import PlanB from "./pages/PlanB";
 import Nearby from "./pages/Nearby";
 import Login from "./pages/loginpage";
 import Account from "./pages/account";
+import UploadPlace from "./pages/UploadPlace";
 import NotFound from "./pages/NotFound";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
         <Route path="/itinerary" component={Itinerary} />
         <Route path="/plan-b" component={PlanB} />
         <Route path="/nearby" component={Nearby} />
+        <Route path="/upload-place" component={UploadPlace} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
