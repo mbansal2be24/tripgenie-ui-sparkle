@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Plane, Upload, Home, User, LogOut } from "lucide-react";
+import { Plane, Upload, Home, User, LogOut, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
@@ -30,6 +30,12 @@ const Navbar = () => {
               <Link href="/home" data-testid="link-nav-home">
                 <Home className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Home</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/hidden-gems" data-testid="link-nav-hidden-gems">
+                <Gem className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Hidden Gems</span>
               </Link>
             </Button>
             {isHomePage && (
