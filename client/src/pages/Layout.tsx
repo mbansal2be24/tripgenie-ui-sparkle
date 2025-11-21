@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { useLocation } from "wouter";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -8,18 +7,16 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const [location] = useLocation();
-  const isLoginPage = location === "/";
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {!isLoginPage && <Navbar />}
+      <Navbar />
       <main className="flex-1">
         {children}
       </main>
-      {!isLoginPage && <Footer />}
+      <Footer />
     </div>
   );
 };
 
 export default Layout;
+
