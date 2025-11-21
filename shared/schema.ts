@@ -109,3 +109,28 @@ export const indoorPlaceSchema = z.object({
 
 export type IndoorPlace = z.infer<typeof indoorPlaceSchema>;
 export type InsertIndoorPlace = Omit<IndoorPlace, "id">;
+
+// Underrated Place submission schema
+export const underratedPlaceSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().min(1),
+  description: z.string().min(10),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  imageUrl: z.string(),
+  status: z.enum(["verified", "pending_review", "rejected"]),
+  exifDistance: z.number().optional(),
+  reverseImageFound: z.boolean().optional(),
+  aiFakeScore: z.number().min(0).max(100).optional(),
+  createdAt: z.date().optional(),
+});
+
+export type UnderratedPlace = z.infer<typeof underratedPlaceSchema>;
+export type InsertUnderratedPlace = Omit<UnderratedPlace, "id" | "createdAt" | "status">;
+
+export const placeSubmissionSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(10),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});

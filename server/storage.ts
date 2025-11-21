@@ -12,6 +12,7 @@ import type {
   User,
   InsertUser,
   PublicUser,
+  UnderratedPlace,
 } from "../shared/schema";
 
 export interface IStorage {
@@ -43,6 +44,11 @@ export interface IStorage {
 
   // Indoor alternative operations
   getIndoorAlternatives(tripId: number): Promise<IndoorPlace[]>;
+
+  // Underrated place operations
+  createUnderratedPlace(place: Omit<UnderratedPlace, "id" | "createdAt">): Promise<UnderratedPlace>;
+  getUnderratedPlaces(): Promise<UnderratedPlace[]>;
+  getUnderratedPlace(id: number): Promise<UnderratedPlace | null>;
 }
 
 // In-memory storage implementation
@@ -53,6 +59,7 @@ class MemStorage implements IStorage {
   private restaurants: Map<number, Restaurant> = new Map();
   private nearbyPlaces: Map<number, NearbyPlace> = new Map();
   private indoorPlaces: Map<number, IndoorPlace> = new Map();
+  private underratedPlaces: Map<number, UnderratedPlace> = new Map();
   
   private userIdCounter = 1;
   private tripIdCounter = 1;
@@ -60,6 +67,7 @@ class MemStorage implements IStorage {
   private restaurantIdCounter = 1;
   private nearbyPlaceIdCounter = 1;
   private indoorPlaceIdCounter = 1;
+  private underratedPlaceIdCounter = 1;
 
   // User operations
   async createUser(user: InsertUser): Promise<PublicUser> {
@@ -235,6 +243,25 @@ class MemStorage implements IStorage {
     return Array.from(this.indoorPlaces.values()).filter(
       (p) => p.tripId === tripId
     );
+  }
+
+  // Underrated place operations
+  async createUnderratedPlace(place: Omit<UnderratedPlace, "id" | "createdAt">): Promise<UnderratedPlace> {
+    const newPlace: UnderratedPlace = {
+      ...place,
+      id: this.underratedPlaceIdCounter++,
+      createdAt: new Date(),
+    };
+    this.underratedPlaces.set(newPlace.id, newPlace);
+    return newPlace;
+  }
+
+  async getUnderratedPlaces(): Promise<UnderratedPlace[]> {
+    return Array.from(this.underratedPlaces.values());
+  }
+
+  async getUnderratedPlace(id: number): Promise<UnderratedPlace | null> {
+    return this.underratedPlaces.get(id) || null;
   }
 }
 
