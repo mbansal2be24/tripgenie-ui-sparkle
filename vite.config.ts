@@ -2,11 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-build: {
-  outDir: path.resolve(process.cwd(), "dist/public"),
-  emptyOutDir: true,
-  assetsInlineLimit: 0,
-},
+
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
