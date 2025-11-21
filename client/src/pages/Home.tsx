@@ -144,7 +144,13 @@ const Home = () => {
       setLocation("/itinerary");
     } catch (error: any) {
       console.error("Trip generation error:", error);
-      toast.error(error.message || "Failed to create trip. Please try again.");
+      console.error("Error details:", {
+        message: error?.message,
+        name: error?.name,
+        stack: error?.stack,
+        toString: error?.toString()
+      });
+      toast.error(error?.message || error?.toString() || "Failed to create trip. Please try again.");
     } finally {
       setIsLoading(false);
     }
