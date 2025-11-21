@@ -7,6 +7,7 @@ import { Mic, Sparkles } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { useTrip } from "@/context/TripContext";
 
 const interests = [
   "Adventure",
@@ -21,6 +22,7 @@ const interests = [
 
 const Home = () => {
   const [, setLocation] = useLocation();
+  const { setCurrentTrip } = useTrip();
   const [destination, setDestination] = useState("");
   const [days, setDays] = useState("");
   const [budget, setBudget] = useState("");
@@ -77,9 +79,8 @@ const Home = () => {
       }
 
       const trip = await response.json();
-      const { useTrip } = await import("../context/TripContext");
-      // Store trip in context via localStorage since we can't access hook here
-      localStorage.setItem("currentTrip", JSON.stringify(trip));
+      // Update trip context (which also updates localStorage)
+      setCurrentTrip(trip);
       toast.success("Trip created successfully!");
       setLocation("/dashboard");
     } catch (error) {
