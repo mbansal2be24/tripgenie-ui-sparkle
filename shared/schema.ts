@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Trip schema
+// Existing schemas...
 export const tripSchema = z.object({
   id: z.number().optional(),
   destination: z.string(),
@@ -13,6 +13,41 @@ export const tripSchema = z.object({
 
 export type Trip = z.infer<typeof tripSchema>;
 export type InsertTrip = Omit<Trip, "id" | "createdAt">;
+
+// User schema
+export const userSchema = z.object({
+  id: z.number().optional(),
+  name: z.string(),
+  email: z.string().email(),
+  password: z.string().min(6),
+  createdAt: z.date().optional(),
+});
+
+export type User = z.infer<typeof userSchema>;
+export type InsertUser = Omit<User, "id" | "createdAt">;
+export type PublicUser = Omit<User, "password">;
+
+// Auth schemas
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export const signupSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export const updateProfileSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string().min(6),
+});
 
 // Attraction schema
 export const attractionSchema = z.object({
