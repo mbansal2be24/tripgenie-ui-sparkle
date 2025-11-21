@@ -47,9 +47,11 @@ TripGenie is an AI-powered travel planning application that helps users create p
 - ✅ Moved all frontend files to `client/` directory
 - ✅ Created `server/` and `shared/` directories for backend structure
 
-### Current Issues
-- ⚠️ Vite alias configuration causing path resolution issues
-- ⚠️ TSX watch causing infinite restart loop due to vite.config.ts timestamp files
+### Completed Steps
+- ✅ Built "Underrated Places Submission" feature with automatic verification
+- ✅ Implemented three-tier verification system (EXIF, reverse image search, AI detection)
+- ✅ Updated Navbar with accessible navigation using asChild pattern
+- ✅ Comprehensive data-testid coverage for all interactive elements
 
 ### Pages
 1. **Home** (`/`) - Trip planning input form with destination, budget, days, interests
@@ -57,6 +59,7 @@ TripGenie is an AI-powered travel planning application that helps users create p
 3. **Itinerary** (`/itinerary`) - Detailed day-by-day itinerary
 4. **Plan B** (`/plan-b`) - Indoor alternatives for bad weather
 5. **Nearby** (`/nearby`) - Nearby attractions and restaurants
+6. **Upload Place** (`/upload-place`) - Submit hidden travel gems with automatic verification
 
 ## Features
 - AI-powered trip suggestions
@@ -64,10 +67,29 @@ TripGenie is an AI-powered travel planning application that helps users create p
 - Budget tracking
 - Interest-based activity filtering
 - Responsive design with dark mode support
+- **Underrated Places Submission** - Users can submit hidden travel gems with:
+  - Photo upload with EXIF metadata extraction
+  - Location verification (500m radius check)
+  - Reverse image search to ensure originality
+  - AI fake detection for submitted photos
+  - Automatic status assignment (verified/under_review)
 
 ## Development Notes
 - Server runs on port 5000
 - Frontend uses Shadcn UI components with Tailwind CSS
 - All routing done client-side with Wouter
-- Backend API endpoints to be implemented in `server/routes.ts`
+- Backend API endpoints implemented in `server/routes.ts`
 - Storage layer uses in-memory storage by default (can be switched to database)
+- All interactive elements have data-testid attributes for comprehensive testing
+
+## API Endpoints
+- `POST /api/places/submit` - Submit a new underrated place with automatic verification
+  - Accepts: multipart/form-data with title, description, latitude, longitude, image (optional)
+  - Returns: Place object with verification status and details
+  - Verification includes: EXIF location check (500m), reverse image search, AI fake detection
+
+## Technical Implementation Notes
+- **Photo Uploads**: Use FormData with native fetch (not apiRequest) to preserve browser-managed Content-Type headers
+- **Navigation**: Navbar uses Button with asChild pattern to avoid nested interactive elements
+- **Verification System**: Currently uses placeholder logic for reverse image search and AI detection (to be replaced with real APIs in production)
+- **EXIF Extraction**: Uses `exifr` library to extract GPS coordinates from uploaded photos
