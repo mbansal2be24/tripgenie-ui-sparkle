@@ -1,30 +1,20 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TripGenie - AI-Powered Travel Planning</title>
-    <meta name="description" content="Plan smarter with TripGenie - Your personalized AI travel companion for unforgettable journeys. Get smart itineraries, weather updates, and local recommendations." />
-    <meta name="author" content="TripGenie" />
-<link rel="icon" href="/favicon.ico?v=10" />
+import Groq from "groq-sdk";
+import dotenv from "dotenv";
 
-    <meta property="og:title" content="TripGenie - AI-Powered Travel Planning" />
-    <meta property="og:description" content="Your personalized AI travel companion for unforgettable journeys" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+dotenv.config();
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    
-    <!-- Google Maps JavaScript API -->
-    <script>
-      window.GOOGLE_MAPS_API_KEY = 'AIzaSyAc5QNW7fuQzAEStLJT8mmfcnE900_OGfs';
-    </script>
-  </head>
+export const groqConfig = {
+  apiKey: process.env.LLAMA_API_KEY as string,
+  model: "llama-3.1-8b-instant",
+  maxTokens: 2048,
+  temperature: 0.7
+};
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+export const initializeGroq = () => {
+  if (!groqConfig.apiKey) {
+    throw new Error("LLAMA_API_KEY not found in environment variables");
+  }
+  return new Groq({
+    apiKey: groqConfig.apiKey,
+  });
+};
