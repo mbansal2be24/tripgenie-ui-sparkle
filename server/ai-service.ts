@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 export async function generateItinerary(trip: Trip) {
   try {
-    const prompt = `Generate a ${trip.days}-day travel itinerary for ${trip.destination} for ${trip.travelStyle} travelers with a budget of $${trip.budget}.
+    const prompt = `Generate a ${trip.days}-day travel itinerary for ${trip.destination} for ${trip.travelStyle} travelers with a budget of ₹${trip.budget} (INR).
 Interests: ${trip.interests.join(", ")}
 
 Return JSON with this structure (no markdown, just JSON):
@@ -16,15 +16,17 @@ Return JSON with this structure (no markdown, just JSON):
     {"name": "...", "description": "...", "timing": "Morning|Afternoon|Evening", "rating": 4.5, "reviews": 1000, "category": "..."}
   ],
   "restaurants": [
-    {"name": "...", "rating": 4.5, "reviews": 500, "price": 35, "cuisine": "...", "day": 1, "mealType": "Lunch|Breakfast|Dinner"}
+    {"name": "...", "rating": 4.5, "reviews": 500, "price": 2500, "cuisine": "...", "day": 1, "mealType": "Lunch|Breakfast|Dinner"}
   ],
   "nearbyPlaces": [
-    {"name": "...", "category": "attractions|food|cafes|nightlife", "rating": 4.5, "reviews": 500, "priceLevel": "$", "distance": "1.5 km"}
+    {"name": "...", "category": "attractions|food|cafes|nightlife", "rating": 4.5, "reviews": 500, "priceLevel": "₹₹", "distance": "1.5 km"}
   ],
   "indoorAlternatives": [
     {"name": "...", "description": "...", "rating": 4.5}
   ]
-}`;
+}
+
+Note: All prices should be in Indian Rupees (INR). Restaurant prices should be per person in INR.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",

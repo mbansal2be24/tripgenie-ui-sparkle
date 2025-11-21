@@ -245,7 +245,7 @@ const Account = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-4 w-4" />
-                          <span>${trip.budget}</span>
+                          <span>₹{trip.budget}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4" />

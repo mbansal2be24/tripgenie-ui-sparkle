@@ -132,11 +132,11 @@ const Home = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="budget">Budget (USD)</Label>
+              <Label htmlFor="budget">Budget (INR)</Label>
               <Input
                 id="budget"
                 type="number"
-                placeholder="2000"
+                placeholder="150000"
                 className="h-12"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}

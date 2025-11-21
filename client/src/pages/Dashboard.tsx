@@ -64,7 +64,7 @@ const Dashboard = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">Budget</h3>
-                <p className="text-2xl font-bold text-foreground">${currentTrip.budget}</p>
+                <p className="text-2xl font-bold text-foreground">₹{currentTrip.budget}</p>
               </div>
             </div>
           </Card>

@@ -101,7 +101,7 @@ const Itinerary = () => {
             </div>
             <div>
               <p className="text-muted-foreground">Budget</p>
-              <p className="font-semibold text-foreground">${currentTrip.budget}</p>
+              <p className="font-semibold text-foreground">₹{currentTrip.budget}</p>
             </div>
           </div>
         </Card>
@@ -166,7 +166,7 @@ const Itinerary = () => {
                               <span>{spot.rating}</span>
                             </div>
                             <span>({spot.reviews} reviews)</span>
-                            <span>${spot.price}/person</span>
+                            <span>₹{spot.price}/person</span>
                           </div>
                         </div>
                       </div>
