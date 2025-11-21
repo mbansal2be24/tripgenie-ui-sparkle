@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, Shuffle, Star, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 
 const mockIndoorPlaces = [
@@ -33,7 +33,7 @@ const mockIndoorPlaces = [
 ];
 
 const PlanB = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-8">
@@ -92,7 +92,7 @@ const PlanB = () => {
 
         <div className="flex flex-col sm:flex-row gap-4">
           <Button
-            onClick={() => navigate("/itinerary")}
+            onClick={() => setLocation("/itinerary")}
             variant="outline"
             size="lg"
             className="flex-1 gap-2 border-2"

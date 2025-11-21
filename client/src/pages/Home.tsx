@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +19,7 @@ const interests = [
 ];
 
 const Home = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const toggleInterest = (interest: string) => {
@@ -31,7 +31,7 @@ const Home = () => {
   };
 
   const handleGenerateTrip = () => {
-    navigate("/dashboard");
+    setLocation("/dashboard");
   };
 
   return (

@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Calendar, DollarSign, Cloud, Route, AlertTriangle, Compass, Heart } from "lucide-react";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-8">
@@ -72,7 +72,7 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Button
-            onClick={() => navigate("/itinerary")}
+            onClick={() => setLocation("/itinerary")}
             variant="default"
             size="lg"
             className="h-24 text-lg font-semibold flex flex-col gap-2 hover:scale-[1.02] transition-transform"
@@ -82,7 +82,7 @@ const Dashboard = () => {
           </Button>
 
           <Button
-            onClick={() => navigate("/plan-b")}
+            onClick={() => setLocation("/plan-b")}
             variant="outline"
             size="lg"
             className="h-24 text-lg font-semibold flex flex-col gap-2 hover:scale-[1.02] transition-transform border-2"
@@ -92,7 +92,7 @@ const Dashboard = () => {
           </Button>
 
           <Button
-            onClick={() => navigate("/nearby")}
+            onClick={() => setLocation("/nearby")}
             variant="outline"
             size="lg"
             className="h-24 text-lg font-semibold flex flex-col gap-2 hover:scale-[1.02] transition-transform border-2"
