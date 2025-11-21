@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useTrip } from "@/context/TripContext";
+import { useTripPlanner } from "@/hooks/useTripPlanner";
 
 const interests = [
   "Adventure",
@@ -23,6 +24,7 @@ const interests = [
 const Home = () => {
   const [, setLocation] = useLocation();
   const { setCurrentTrip } = useTrip();
+  const { generatePlan, loading: aiLoading } = useTripPlanner();
   const [destination, setDestination] = useState("");
   const [days, setDays] = useState("");
   const [budget, setBudget] = useState("");
@@ -62,7 +64,8 @@ const Home = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/trips", {
+      // First, create the trip record
+      const tripResponse = await fetch("/api/trips", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -74,18 +77,74 @@ const Home = () => {
         }),
       });
 
-      if (!response.ok) {
+      if (!tripResponse.ok) {
         throw new Error("Failed to create trip");
       }
 
-      const trip = await response.json();
-      // Update trip context (which also updates localStorage)
+      const trip = await tripResponse.json();
+      
+      // Now generate the AI trip plan
+      toast.info("🤖 AI is generating your personalized itinerary...");
+      
+      const aiPlanData = {
+        userPreferences: {
+          interests: selectedInterests,
+          budget: parseInt(budget),
+          pace: travelStyle,
+          foodPreference: selectedInterests.includes("Food") ? ["Local", "Fine Dining"] : ["Local"],
+          travelStyle: [travelStyle],
+        },
+        location: {
+          city: destination,
+        },
+        duration: parseInt(days),
+        visited: [],
+        previouslyShown: [],
+      };
+
+      const aiPlan = await generatePlan(aiPlanData);
+      
+      // Save the AI-generated plan to the trip
+      if (aiPlan && aiPlan.days) {
+        // Save attractions and restaurants from AI plan
+        for (const day of aiPlan.days) {
+          for (const place of day.places || []) {
+            await fetch(`/api/trips/${trip.id}/attractions`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: place.name,
+                description: place.description || "",
+                timing: place.timing || "Morning",
+                type: place.type || "attraction",
+                distance: place.distance || "",
+                transport: place.transport || "",
+              }),
+            });
+          }
+        }
+
+        // Save restaurants/cafes
+        for (const cafe of aiPlan.cafes || []) {
+          await fetch(`/api/trips/${trip.id}/restaurants`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: cafe.name || cafe,
+              rating: cafe.rating || 4.5,
+              price: cafe.price || 500,
+            }),
+          });
+        }
+      }
+
+      // Update trip context
       setCurrentTrip(trip);
-      toast.success("Trip created successfully!");
-      setLocation("/dashboard");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to create trip. Please try again.");
+      toast.success("✨ Your AI-powered trip plan is ready!");
+      setLocation("/itinerary");
+    } catch (error: any) {
+      console.error("Trip generation error:", error);
+      toast.error(error.message || "Failed to create trip. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -188,11 +247,21 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button
               onClick={handleGenerateTrip}
-              disabled={isLoading}
+              disabled={isLoading || aiLoading}
               className="flex-1 h-12 text-base font-semibold"
               size="lg"
             >
-              {isLoading ? "Creating Trip..." : "Generate Trip"}
+              {isLoading || aiLoading ? (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                  {aiLoading ? "AI is planning..." : "Creating Trip..."}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate Trip with AI
+                </>
+              )}
             </Button>
             <Button
               variant="outline"
