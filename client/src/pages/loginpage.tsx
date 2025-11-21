@@ -7,9 +7,11 @@ import { Card } from "@/components/ui/card";
 import { Plane, Lock, Mail } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [, setLocation] = useLocation();
+  const { login } = useAuth();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [signupName, setSignupName] = useState("");
@@ -38,6 +40,7 @@ const Login = () => {
 
       const data = await response.json();
       localStorage.setItem("user", JSON.stringify(data.user));
+      login();
       toast.success("Welcome back!");
       setLocation("/home");
     } catch (error) {
@@ -72,6 +75,7 @@ const Login = () => {
 
       const data = await response.json();
       localStorage.setItem("user", JSON.stringify(data.user));
+      login();
       toast.success("Account created successfully!");
       setLocation("/home");
     } catch (error) {

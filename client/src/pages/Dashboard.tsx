@@ -1,19 +1,46 @@
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MapPin, Calendar, DollarSign, Cloud, Route, AlertTriangle, Compass, Heart } from "lucide-react";
+import { MapPin, Calendar, DollarSign, Cloud, Route, AlertTriangle, Compass, Gem, Star } from "lucide-react";
 import { useTrip } from "@/context/TripContext";
+
+interface Place {
+  id: string;
+  title: string;
+  description: string;
+  status: "verified" | "under_review";
+  latitude: number;
+  longitude: number;
+}
 
 const Dashboard = () => {
   const [, setLocation] = useLocation();
   const { currentTrip } = useTrip();
+  const [places, setPlaces] = useState<Place[]>([]);
+
+  useEffect(() => {
+    fetchPlaces();
+  }, []);
+
+  const fetchPlaces = async () => {
+    try {
+      const response = await fetch("/api/places");
+      if (response.ok) {
+        const data = await response.json();
+        setPlaces(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch places", error);
+    }
+  };
 
   if (!currentTrip) {
     return (
       <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">No trip selected. Create one first!</p>
-          <Button onClick={() => setLocation("/")}>Create Trip</Button>
+          <Button onClick={() => setLocation("/home")}>Create Trip</Button>
         </div>
       </div>
     );
@@ -83,6 +110,37 @@ const Dashboard = () => {
           </div>
         </Card>
 
+        {places.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <Gem className="h-6 w-6 text-primary" />
+              Hidden Gems on Your Trip
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {places.map((place) => (
+                <Card key={place.id} className="p-4 hover:shadow-medium transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-semibold text-foreground">{place.title}</h3>
+                    {place.status === "verified" && (
+                      <Star className="h-4 w-4 text-success fill-success" />
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">{place.description}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <MapPin className="h-3 w-3" />
+                    <span>{place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}</span>
+                  </div>
+                  <span className={`inline-block mt-3 px-2 py-1 rounded text-xs font-medium ${
+                    place.status === "verified" ? "bg-success/20 text-success" : "bg-warning/20 text-warning"
+                  }`}>
+                    {place.status === "verified" ? "Verified" : "Under Review"}
+                  </span>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Button
             onClick={() => setLocation("/itinerary")}
@@ -119,7 +177,7 @@ const Dashboard = () => {
             size="lg"
             className="h-24 text-lg font-semibold flex flex-col gap-2 hover:scale-[1.02] transition-transform border-2"
           >
-            <Heart className="h-8 w-8" />
+            <Star className="h-8 w-8" />
             Favorites (Upvoted)
           </Button>
         </div>
