@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => ({
       "@shared": path.resolve(process.cwd(), "shared"),
     },
   },
+  server: {
+    allowedHosts: true,
+  },
   root: path.resolve(process.cwd(), "client"),
   build: {
     outDir: path.resolve(process.cwd(), "dist/public"),
