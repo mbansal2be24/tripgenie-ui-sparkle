@@ -17,7 +17,7 @@ import {
   placeSubmissionSchema,
 } from "../shared/schema";
 import aiRoutes from "./routes/aiRoutes";
-import mapsRoutes from "./routes/mapsRoutes";
+import mapsRoutes from "./routes/mapRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
