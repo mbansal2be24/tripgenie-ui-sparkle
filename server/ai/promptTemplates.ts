@@ -4,13 +4,17 @@ export const buildTripPlannerPrompt = (request: any) => {
   const weatherInfo = location.weather ? `- Weather: ${location.weather.temperature}°C, ${location.weather.condition}` : '';
   const geotagInfo = location.geotag ? `- Coordinates: ${location.geotag.latitude}, ${location.geotag.longitude}` : '';
   
+  const interests = Array.isArray(userPreferences.interests) ? userPreferences.interests.join(', ') : 'Adventure';
+  const foodPref = Array.isArray(userPreferences.foodPreference) ? userPreferences.foodPreference.join(', ') : 'Any';
+  const travelStyle = Array.isArray(userPreferences.travelStyle) ? userPreferences.travelStyle.join(', ') : 'Moderate';
+  
   return "Generate a " + duration + "-day trip plan for " + location.city + ".\n\n" +
     "USER PREFERENCES:\n" +
-    "- Interests: " + userPreferences.interests.join(', ') + "\n" +
+    "- Interests: " + interests + "\n" +
     "- Budget: " + userPreferences.budget + "\n" +
     "- Pace: " + userPreferences.pace + "\n" +
-    "- Food: " + userPreferences.foodPreference.join(', ') + "\n" +
-    "- Travel Style: " + userPreferences.travelStyle.join(', ') + "\n\n" +
+    "- Food: " + foodPref + "\n" +
+    "- Travel Style: " + travelStyle + "\n\n" +
     "LOCATION DATA:\n" +
     "- City: " + location.city + "\n" +
     geotagInfo + (geotagInfo ? "\n" : "") +
@@ -52,12 +56,13 @@ export const buildShufflePrompt = (request: any) => {
   const { placeName, placeType, location, userPreferences, visited = [], previouslyShown = [] } = request;
   
   const weatherInfo = location.weather ? `Weather: ${location.weather.temperature}°C, ${location.weather.condition}` : '';
+  const interests = Array.isArray(userPreferences.interests) ? userPreferences.interests.join(', ') : 'Adventure';
   
   return 'Replace this place: "' + placeName + '" (type: ' + placeType + ')\n\n' +
     "REQUIREMENTS:\n" +
     "- Same category/type as original\n" +
     "- Located in " + location.city + " or nearby\n" +
-    "- Match user interests: " + userPreferences.interests.join(', ') + "\n" +
+    "- Match user interests: " + interests + "\n" +
     "- Different vibe but relevant\n" +
     "- NOT these places: " + [placeName, ...visited, ...previouslyShown].join(', ') + "\n\n" +
     weatherInfo + (weatherInfo ? "\n\n" : "") +
