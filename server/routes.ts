@@ -16,6 +16,8 @@ import {
   changePasswordSchema,
   placeSubmissionSchema,
 } from "../shared/schema";
+import aiRoutes from "./routes/aiRoutes";
+import mapsRoutes from "./routes/mapsRoutes";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -75,6 +77,12 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
+
+  // ============= AI ENDPOINTS =============
+  app.use("/api/ai", aiRoutes);
+
+  // ============= MAPS ENDPOINTS =============
+  app.use("/api/maps", mapsRoutes);
 
   // ============= AUTH ENDPOINTS =============
   
