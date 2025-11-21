@@ -39,7 +39,7 @@ const Login = () => {
       const data = await response.json();
       localStorage.setItem("user", JSON.stringify(data.user));
       toast.success("Welcome back!");
-      setLocation("/");
+      setLocation("/home");
     } catch (error) {
       toast.error("Invalid credentials. Please try again.");
     } finally {
@@ -73,7 +73,7 @@ const Login = () => {
       const data = await response.json();
       localStorage.setItem("user", JSON.stringify(data.user));
       toast.success("Account created successfully!");
-      setLocation("/");
+      setLocation("/home");
     } catch (error) {
       toast.error("Failed to create account. Please try again.");
     } finally {
