@@ -1,0 +1,88 @@
+Here is a **perfect, clean prompt** you can give directly to the **Replit Agent** to build the entire feature fast.
+
+---
+
+# ✅ **PROMPT FOR REPLIT AGENT**
+
+**Build a new feature in my existing React + Node backend project: an “Underrated Places Submission” page with automatic verification.**
+
+### **Feature Requirements**
+
+1. Create a new frontend page:
+   **`UploadPlace.tsx`** inside `src/pages/`
+   Fields:
+
+   * Photo upload
+   * Location input (GPS or address converted to coordinates)
+   * Title of place
+   * Description
+
+2. Create a backend route:
+   **POST `/api/places/submit`**
+   This should accept:
+
+   ```json
+   {
+     "title": "",
+     "description": "",
+     "latitude": "",
+     "longitude": "",
+     "image": "<uploaded file>"
+   }
+   ```
+
+3. Add **three verification checks (automatic)**:
+
+   ### **A. EXIF Location Check**
+
+   * Extract EXIF GPS from the uploaded image
+   * Compare distance with user-submitted location
+   * If distance > 500m → mark as `pending_review`
+
+   ### **B. Reverse Image Search**
+
+   * Use any free API or placeholder logic
+   * If the image is found online → reject
+
+   ### **C. AI Fake Image Detection**
+
+   * Use a simple open API or placeholder
+   * If AI probability > 70% → mark as `pending_review`
+
+4. **Final Decision Logic**:
+
+   ```
+   IF (EXIF matches <= 500m) AND (Reverse search = not found) AND (AI fake score < 70%) 
+       → status = "verified"
+   ELSE 
+       → status = "pending_review"
+   ```
+
+5. Save into in-memory storage (or create a new storage file):
+
+   ```
+   id, title, description, coords, imageURL, status, createdAt
+   ```
+
+6. Return JSON response:
+
+   ```json
+   {
+     "message": "Place submitted",
+     "status": "verified" | "pending_review"
+   }
+   ```
+
+7. Add a button in the Navbar to navigate to `/upload-place`.
+
+### **Deliverables**
+
+* Full frontend page
+* Backend route + verification logic
+* Updated router + storage
+* Example placeholder verification logic
+* Full code implemented inside my project
+
+---
+
+If you want, I can also write a **Bubble-compatible** version or a **more advanced AI version**.
