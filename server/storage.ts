@@ -35,6 +35,12 @@ export interface IStorage {
 
   // Indoor alternative operations
   getIndoorAlternatives(tripId: number): Promise<IndoorPlace[]>;
+
+  // Bulk operations for storing generated data
+  storeGeneratedAttractions(tripId: number, attractions: InsertAttraction[]): Promise<void>;
+  storeGeneratedRestaurants(tripId: number, restaurants: InsertRestaurant[]): Promise<void>;
+  storeGeneratedNearbyPlaces(tripId: number, places: InsertNearbyPlace[]): Promise<void>;
+  storeGeneratedIndoorPlaces(tripId: number, places: InsertIndoorPlace[]): Promise<void>;
 }
 
 // In-memory storage implementation
@@ -155,6 +161,40 @@ class MemStorage implements IStorage {
     return Array.from(this.indoorPlaces.values()).filter(
       (p) => p.tripId === tripId
     );
+  }
+
+  // Bulk operations
+  async storeGeneratedAttractions(tripId: number, attractions: InsertAttraction[]): Promise<void> {
+    for (const attraction of attractions) {
+      await this.createAttraction(attraction);
+    }
+  }
+
+  async storeGeneratedRestaurants(tripId: number, restaurants: InsertRestaurant[]): Promise<void> {
+    for (const restaurant of restaurants) {
+      await this.createRestaurant(restaurant);
+    }
+  }
+
+  async storeGeneratedNearbyPlaces(tripId: number, places: InsertNearbyPlace[]): Promise<void> {
+    for (const place of places) {
+      const newPlace: NearbyPlace = {
+        ...place,
+        id: this.nearbyPlaceIdCounter++,
+        upvotes: 0,
+      };
+      this.nearbyPlaces.set(newPlace.id, newPlace);
+    }
+  }
+
+  async storeGeneratedIndoorPlaces(tripId: number, places: InsertIndoorPlace[]): Promise<void> {
+    for (const place of places) {
+      const newPlace: IndoorPlace = {
+        ...place,
+        id: this.indoorPlaceIdCounter++,
+      };
+      this.indoorPlaces.set(newPlace.id, newPlace);
+    }
   }
 
   // Helper method
