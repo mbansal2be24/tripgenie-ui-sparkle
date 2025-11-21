@@ -1,11 +1,15 @@
-import express from "express";
-import { generateTripPlan, shufflePlace, chatWithAI } from "../controllers/aiController";
-import { aiRateLimiter, chatRateLimiter } from "../middleware/rateLimiter";
+import rateLimit from "express-rate-limit";
 
-const router = express.Router();
+export const aiRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // 20 requests per window
+  message: "Too many AI requests, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
-router.post("/trip-plan", aiRateLimiter, generateTripPlan);
-router.post("/shuffle", aiRateLimiter, shufflePlace);
-router.post("/chat", chatRateLimiter, chatWithAI);
-
-export default router;
+export const chatRateLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 10,
+  message: "Too many chat messages, please slow down"
+});
