@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, Star, DollarSign, ArrowUp, Shuffle, ExternalLink } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { useTrip } from "@/context/TripContext";
 
-const mockPlaces = [
+const defaultMockPlaces = [
   {
     name: "Sacré-Cœur",
     category: "attractions",
@@ -81,9 +82,34 @@ const categories = [
 ];
 
 const Nearby = () => {
+  const { currentTrip } = useTrip();
   const [activeCategory, setActiveCategory] = useState("attractions");
+  const [places, setPlaces] = useState(defaultMockPlaces);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPlaces = mockPlaces.filter(
+  useEffect(() => {
+    loadPlaces();
+  }, [currentTrip]);
+
+  const loadPlaces = async () => {
+    if (!currentTrip) {
+      setPlaces(defaultMockPlaces);
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/trips/${currentTrip.id}/nearby?category=${activeCategory}`);
+      const data = await res.json();
+      setPlaces(data.length > 0 ? data : defaultMockPlaces);
+    } catch {
+      setPlaces(defaultMockPlaces);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPlaces = places.filter(
     (place) => place.category === activeCategory
   );
 

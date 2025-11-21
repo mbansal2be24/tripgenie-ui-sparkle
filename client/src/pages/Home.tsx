@@ -77,6 +77,9 @@ const Home = () => {
       }
 
       const trip = await response.json();
+      const { useTrip } = await import("../context/TripContext");
+      // Store trip in context via localStorage since we can't access hook here
+      localStorage.setItem("currentTrip", JSON.stringify(trip));
       toast.success("Trip created successfully!");
       setLocation("/dashboard");
     } catch (error) {

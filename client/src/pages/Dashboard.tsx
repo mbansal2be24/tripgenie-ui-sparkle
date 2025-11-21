@@ -2,9 +2,22 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Calendar, DollarSign, Cloud, Route, AlertTriangle, Compass, Heart } from "lucide-react";
+import { useTrip } from "@/context/TripContext";
 
 const Dashboard = () => {
   const [, setLocation] = useLocation();
+  const { currentTrip } = useTrip();
+
+  if (!currentTrip) {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">No trip selected. Create one first!</p>
+          <Button onClick={() => setLocation("/")}>Create Trip</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-8">
@@ -26,7 +39,7 @@ const Dashboard = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">Destination</h3>
-                <p className="text-2xl font-bold text-primary">Paris, France</p>
+                <p className="text-2xl font-bold text-primary">{currentTrip.destination}</p>
               </div>
             </div>
           </Card>
@@ -38,8 +51,8 @@ const Dashboard = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">Duration</h3>
-                <p className="text-2xl font-bold text-foreground">7 Days</p>
-                <p className="text-sm text-muted-foreground mt-1">Couple</p>
+                <p className="text-2xl font-bold text-foreground">{currentTrip.days} Days</p>
+                <p className="text-sm text-muted-foreground mt-1">{currentTrip.travelStyle}</p>
               </div>
             </div>
           </Card>
@@ -51,7 +64,7 @@ const Dashboard = () => {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground mb-1">Budget</h3>
-                <p className="text-2xl font-bold text-foreground">$2,000</p>
+                <p className="text-2xl font-bold text-foreground">${currentTrip.budget}</p>
               </div>
             </div>
           </Card>

@@ -1,22 +1,64 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MapPin, Clock, Shuffle, ArrowUp, Volume2, Download, Utensils, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-const mockAttractions = [
-  { name: "Eiffel Tower", description: "Iconic iron lattice tower with stunning city views", timing: "Morning" },
-  { name: "Louvre Museum", description: "World's largest art museum and historic monument", timing: "Afternoon" },
-  { name: "Notre-Dame", description: "Medieval Catholic cathedral with Gothic architecture", timing: "Afternoon" },
-  { name: "Arc de Triomphe", description: "Monumental arch honoring French military victories", timing: "Evening" },
-];
-
-const mockLunchSpots = [
-  { name: "Café de Flore", rating: 4.5, reviews: 2847, price: 35 },
-  { name: "Le Comptoir", rating: 4.7, reviews: 1923, price: 42 },
-  { name: "Chez L'Ami Jean", rating: 4.6, reviews: 1654, price: 38 },
-];
+import { useTrip } from "@/context/TripContext";
 
 const Itinerary = () => {
+  const { currentTrip } = useTrip();
+  const [attractions, setAttractions] = useState<any[]>([]);
+  const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (currentTrip) {
+      loadData();
+    }
+  }, [currentTrip]);
+
+  const loadData = async () => {
+    if (!currentTrip) return;
+    try {
+      setLoading(true);
+      const [attRes, restRes] = await Promise.all([
+        fetch(`/api/trips/${currentTrip.id}/attractions`),
+        fetch(`/api/trips/${currentTrip.id}/restaurants`),
+      ]);
+      const attractions = await attRes.json();
+      const restaurants = await restRes.json();
+      setAttractions(attractions.length > 0 ? attractions : mockAttractions);
+      setRestaurants(restaurants.length > 0 ? restaurants : mockLunchSpots);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+      setAttractions(mockAttractions);
+      setRestaurants(mockLunchSpots);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!currentTrip) {
+    return (
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
+        <p className="text-muted-foreground">No trip selected</p>
+      </div>
+    );
+  }
+
+  const mockAttractions = [
+    { name: "Eiffel Tower", description: "Iconic iron lattice tower with stunning city views", timing: "Morning" },
+    { name: "Louvre Museum", description: "World's largest art museum and historic monument", timing: "Afternoon" },
+    { name: "Notre-Dame", description: "Medieval Catholic cathedral with Gothic architecture", timing: "Afternoon" },
+    { name: "Arc de Triomphe", description: "Monumental arch honoring French military victories", timing: "Evening" },
+  ];
+
+  const mockLunchSpots = [
+    { name: "Café de Flore", rating: 4.5, reviews: 2847, price: 35 },
+    { name: "Le Comptoir", rating: 4.7, reviews: 1923, price: 42 },
+    { name: "Chez L'Ami Jean", rating: 4.6, reviews: 1654, price: 38 },
+  ];
+
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -25,7 +67,7 @@ const Itinerary = () => {
             Your Smart Itinerary
           </h1>
           <p className="text-muted-foreground">
-            Personalized day-by-day plan for Paris, France
+            Personalized day-by-day plan for {currentTrip.destination}
           </p>
         </div>
 
@@ -34,33 +76,33 @@ const Itinerary = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Destination</p>
-              <p className="font-semibold text-foreground">Paris, France</p>
+              <p className="font-semibold text-foreground">{currentTrip.destination}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Duration</p>
-              <p className="font-semibold text-foreground">7 Days</p>
+              <p className="font-semibold text-foreground">{currentTrip.days} Days</p>
             </div>
             <div>
               <p className="text-muted-foreground">Style</p>
-              <p className="font-semibold text-foreground">Couple</p>
+              <p className="font-semibold text-foreground">{currentTrip.travelStyle}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Budget</p>
-              <p className="font-semibold text-foreground">$2,000</p>
+              <p className="font-semibold text-foreground">${currentTrip.budget}</p>
             </div>
           </div>
         </Card>
 
         <div className="space-y-8">
-          {[1, 2, 3].map((day) => (
+          {Array.from({ length: currentTrip.days }).map((_, day) => (
             <Card key={day} className="overflow-hidden">
               <div className="bg-primary text-primary-foreground p-4">
-                <h2 className="text-2xl font-bold">Day {day}</h2>
+                <h2 className="text-2xl font-bold">Day {day + 1}</h2>
               </div>
 
               <div className="p-6 space-y-6">
                 <div className="space-y-4">
-                  {mockAttractions.map((attraction, idx) => (
+                  {attractions.map((attraction, idx) => (
                     <Card key={idx} className="p-4 hover:shadow-medium transition-shadow">
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
@@ -98,7 +140,7 @@ const Itinerary = () => {
                     <h3 className="font-semibold text-foreground">Lunch Recommendations</h3>
                   </div>
                   <div className="space-y-3">
-                    {mockLunchSpots.map((spot, idx) => (
+                    {restaurants.map((spot, idx) => (
                       <div
                         key={idx}
                         className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-background rounded-lg"

@@ -1,10 +1,12 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, Shuffle, Star, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { useTrip } from "@/context/TripContext";
 
-const mockIndoorPlaces = [
+const defaultIndoorPlaces = [
   {
     name: "Musée d'Orsay",
     description: "Impressionist art museum in a stunning Beaux-Arts railway station",
@@ -34,6 +36,31 @@ const mockIndoorPlaces = [
 
 const PlanB = () => {
   const [, setLocation] = useLocation();
+  const { currentTrip } = useTrip();
+  const [indoorPlaces, setIndoorPlaces] = useState(defaultIndoorPlaces);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAlternatives();
+  }, [currentTrip]);
+
+  const loadAlternatives = async () => {
+    if (!currentTrip) {
+      setIndoorPlaces(defaultIndoorPlaces);
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/trips/${currentTrip.id}/indoor-alternatives`);
+      const data = await res.json();
+      setIndoorPlaces(data.length > 0 ? data : defaultIndoorPlaces);
+    } catch {
+      setIndoorPlaces(defaultIndoorPlaces);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-8">
@@ -64,7 +91,7 @@ const PlanB = () => {
         </div>
 
         <div className="space-y-4 mb-8">
-          {mockIndoorPlaces.map((place, idx) => (
+          {indoorPlaces.map((place, idx) => (
             <Card key={idx} className="p-6 hover:shadow-medium transition-shadow">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
