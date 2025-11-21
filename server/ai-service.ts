@@ -1,15 +1,27 @@
 import dotenv from "dotenv";
-import LlamaAPI from "@llamaapi/llamaapi";
+import Groq from "groq-sdk";
 
 dotenv.config();
 
-// Initialize LLaMA client
-const llama = new LlamaAPI(process.env.LLAMA_API_KEY as string);
+// Initialize Groq client
+const groq = new Groq({
+  apiKey: process.env.LLAMA_API_KEY as string,
+});
 
 export async function tripGenieChat(userMessage: any): Promise<string> {
   try {
-    const body = {
-      model: "llama3.1-8b",
+    // Verify API key is loaded
+    if (!process.env.LLAMA_API_KEY) {
+      console.error("❌ LLAMA_API_KEY is not set in environment variables!");
+      throw new Error("API key not configured");
+    }
+
+    console.log("🤖 Calling Groq API with model: llama-3.1-8b-instant");
+    console.log("📝 User message length:", typeof userMessage === 'string' ? userMessage.length : JSON.stringify(userMessage).length);
+
+    const body: any = {
+      model: "llama-3.1-8b-instant",
+      temperature: 0.2, // Lower temperature for more consistent JSON output
       messages: [
         {
           role: "system",
@@ -134,9 +146,15 @@ Track:
 
 ====================================================
 ### OUTPUT FORMAT
-- Clean structure
-- Bullet points
-- Friendly tone  
+CRITICAL JSON OUTPUT RULES:
+1. Return ONLY valid JSON - no markdown, no code blocks, no explanations
+2. Do NOT wrap JSON in ```json``` code blocks
+3. Do NOT add text before or after the JSON
+4. Ensure all strings are properly quoted
+5. Ensure all commas and brackets are correct
+6. Return the JSON object directly
+
+When asked for JSON, return ONLY the JSON object, nothing else.
 ====================================================
 `
         },
@@ -147,11 +165,37 @@ Track:
       ]
     };
 
-    const response = await llama.run(body);
-    return response.data.choices[0].message.content;
+    const response = await groq.chat.completions.create(body);
+    const content = response.choices[0]?.message?.content || "Sorry, I couldn't generate a response.";
+    
+    console.log("✅ Groq API response received");
+    console.log("📄 Response length:", content.length);
+    console.log("📄 Full response:", content);
+    
+    // Log first and last 200 chars to see structure
+    if (content.length > 400) {
+      console.log("📄 First 200 chars:", content.substring(0, 200));
+      console.log("📄 Last 200 chars:", content.substring(content.length - 200));
+    } else {
+      console.log("📄 Full response (short):", content);
+    }
+    
+    return content;
 
   } catch (error: any) {
-    console.error("TripGenie PRO MAX Wrapper Error:", error);
-    return "Sorry, I couldn't process your request right now.";
+    console.error("❌ TripGenie PRO MAX Wrapper Error:", error);
+    console.error("Error details:", {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      stack: error.stack
+    });
+    
+    // Return more informative error message
+    if (error.message?.includes("API key") || error.message?.includes("authentication")) {
+      return "Error: API key issue. Please check your Groq API key configuration.";
+    }
+    
+    return `Sorry, I couldn't process your request. Error: ${error.message || "Unknown error"}`;
   }
 }
