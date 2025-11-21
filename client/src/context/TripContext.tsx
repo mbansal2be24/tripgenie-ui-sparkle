@@ -1,44 +1,46 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-
-interface Trip {
-  id: number;
-  destination: string;
-  days: number;
-  budget: number;
-  travelStyle: string;
-  interests: string[];
-  createdAt?: string;
-}
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface TripContextType {
-  currentTrip: Trip | null;
-  setCurrentTrip: (trip: Trip) => void;
+  userPreferences: any;
+  setUserPreferences: (prefs: any) => void;
+  visited: string[];
+  addVisited: (place: string) => void;
+  previouslyShown: string[];
+  addPreviouslyShown: (place: string) => void;
+  clearHistory: () => void;
 }
 
-const TripContext = createContext<TripContextType | undefined>(undefined);
+const TripContext = createContext(undefined);
 
-export function TripProvider({ children }: { children: ReactNode }) {
-  const [currentTrip, setCurrentTrip] = useState<Trip | null>(() => {
-    const saved = localStorage.getItem("currentTrip");
-    return saved ? JSON.parse(saved) : null;
-  });
+export const TripProvider: React.FC = ({ children }) => {
+  const [userPreferences, setUserPreferences] = useState(null);
+  const [visited, setVisited] = useState([]);
+  const [previouslyShown, setPreviouslyShown] = useState([]);
 
-  const handleSetTrip = (trip: Trip) => {
-    setCurrentTrip(trip);
-    localStorage.setItem("currentTrip", JSON.stringify(trip));
+  const addVisited = (place: string) => {
+    setVisited(prev => [...new Set([...prev, place])]);
+  };
+
+  const addPreviouslyShown = (place: string) => {
+    setPreviouslyShown(prev => [...new Set([...prev, place])]);
+  };
+
+  const clearHistory = () => {
+    setVisited([]);
+    setPreviouslyShown([]);
   };
 
   return (
-    <TripContext.Provider value={{ currentTrip, setCurrentTrip: handleSetTrip }}>
+    
       {children}
-    </TripContext.Provider>
+    
   );
-}
+};
 
-export function useTrip() {
+export const useTripContext = () => {
   const context = useContext(TripContext);
   if (!context) {
-    throw new Error("useTrip must be used within TripProvider");
+    throw new Error("useTripContext must be used within TripProvider");
   }
   return context;
-}
+};
