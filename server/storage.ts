@@ -9,7 +9,7 @@ import type {
   InsertNearbyPlace,
   IndoorPlace,
   InsertIndoorPlace,
-} from "@shared/schema";
+} from "../shared/schema";
 
 export interface IStorage {
   // Trip operations
@@ -97,7 +97,7 @@ class MemStorage implements IStorage {
   async upvoteAttraction(id: number): Promise<Attraction> {
     const attraction = this.attractions.get(id);
     if (!attraction) throw new Error("Attraction not found");
-    attraction.upvotes += 1;
+    attraction.upvotes = (attraction.upvotes || 0) + 1;
     return attraction;
   }
 
@@ -146,7 +146,7 @@ class MemStorage implements IStorage {
   async upvoteNearbyPlace(id: number): Promise<NearbyPlace> {
     const place = this.nearbyPlaces.get(id);
     if (!place) throw new Error("Nearby place not found");
-    place.upvotes += 1;
+    place.upvotes = (place.upvotes || 0) + 1;
     return place;
   }
 
