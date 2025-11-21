@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MapPin, Clock, Shuffle, ArrowUp, Volume2, Download, Utensils, Star } from "lucide-react";
+import { MapPin, Clock, Shuffle, ArrowUp, Volume2, Download, Utensils, Star, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useTrip } from "@/context/TripContext";
 
 const Itinerary = () => {
+  const [, setLocation] = useLocation();
   const { currentTrip } = useTrip();
   const [attractions, setAttractions] = useState<any[]>([]);
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -62,13 +64,24 @@ const Itinerary = () => {
   return (
     <div className="min-h-[calc(100vh-8rem)] px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Your Smart Itinerary
-          </h1>
-          <p className="text-muted-foreground">
-            Personalized day-by-day plan for {currentTrip.destination}
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              Your Smart Itinerary
+            </h1>
+            <p className="text-muted-foreground">
+              Personalized day-by-day plan for {currentTrip.destination}
+            </p>
+          </div>
+          <Button
+            onClick={() => setLocation("/account")}
+            variant="outline"
+            size="lg"
+            className="gap-2 border-2"
+          >
+            <User className="h-5 w-5" />
+            <span className="hidden sm:inline">Account</span>
+          </Button>
         </div>
 
         <Card className="p-6 mb-8 bg-gradient-to-r from-primary/5 to-info/5 border-primary/20">
